@@ -49,7 +49,8 @@ namespace TDTTetris.Core
             wall.transform.localPosition = pos;
             wall.transform.localScale = scale;
 
-            // 隐藏渲染，保留碰撞
+            // 隐藏渲染，保留碰撞，放在 IgnoreRaycast 层（不挡相机）
+            wall.layer = LayerMask.NameToLayer("Ignore Raycast");
             var renderer = wall.GetComponent<MeshRenderer>();
             if (renderer != null) renderer.enabled = false;
         }
