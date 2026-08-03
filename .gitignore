@@ -74,3 +74,4 @@ ConsoleLog/
 .env.local
 .env.*.local
 .claude/
+mcp/
