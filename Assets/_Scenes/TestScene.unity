@@ -1028,7 +1028,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   followTarget: {fileID: 1078546660}
   inputHandler: {fileID: 1078546657}
-  followOffset: {x: 0, y: 1.8, z: -5}
+  baseYOffset: 0.5
+  yOffsetPitchFactor: 0.025
+  zDistance: 3
   sensitivityX: 2
   sensitivityY: 2
   smoothing: 12
