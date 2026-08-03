@@ -26,7 +26,8 @@ namespace TDTTetris.Player
         [SerializeField] private float rotationSmoothTime = 0.1f;
 
         [Header("碰撞")]
-        [SerializeField] private LayerMask obstructionMask = ~(1 << 2); // 排除 IgnoreRaycast 层
+        [SerializeField] private bool checkObstruction = false; // 关闭后相机不做碰撞检测
+        [SerializeField] private LayerMask obstructionMask = ~0;
         [SerializeField] private float collisionRadius = 0.3f;
         [SerializeField] private float minDistance = 1.5f;
 
@@ -55,9 +56,6 @@ namespace TDTTetris.Player
             var euler = transform.eulerAngles;
             yaw = euler.y;
             pitch = euler.x > 180 ? euler.x - 360 : euler.x;
-
-            // 强制排除 IgnoreRaycast 层（暗墙），相机可自由穿出
-            obstructionMask &= ~(1 << LayerMask.NameToLayer("Ignore Raycast"));
         }
 
         private void LateUpdate()
@@ -109,12 +107,15 @@ namespace TDTTetris.Player
             Vector3 desiredOffset = transform.rotation * new Vector3(0, dynamicY, -dist);
             Vector3 targetPos = followTarget.position + desiredOffset;
 
-            // 碰撞避让
-            Vector3 dir = (targetPos - followTarget.position).normalized;
-            float checkDist = Vector3.Distance(targetPos, followTarget.position);
-            if (Physics.SphereCast(followTarget.position, collisionRadius, dir, out var hit, checkDist, obstructionMask))
+            // 碰撞避让（可关闭）
+            if (checkObstruction)
             {
-                targetPos = followTarget.position + dir * Mathf.Max(hit.distance - collisionRadius, minDistance);
+                Vector3 dir = (targetPos - followTarget.position).normalized;
+                float checkDist = Vector3.Distance(targetPos, followTarget.position);
+                if (Physics.SphereCast(followTarget.position, collisionRadius, dir, out var hit, checkDist, obstructionMask))
+                {
+                    targetPos = followTarget.position + dir * Mathf.Max(hit.distance - collisionRadius, minDistance);
+                }
             }
 
             transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref currentVelocity, 0.08f);
