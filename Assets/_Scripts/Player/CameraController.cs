@@ -29,8 +29,7 @@ namespace TDTTetris.Player
         [SerializeField] private bool fadeObstructions = true;
         [SerializeField] private LayerMask obstructionMask = ~0;
         [SerializeField] private float fadeAlpha = 0.3f;
-        [SerializeField] private float fadeCheckSize = 1.5f;     // 多射线覆盖范围
-        [SerializeField] private int fadeRayCount = 3;           // 每维射线数 (3×3=9条)
+        [SerializeField] private float fadeCheckSize = 1.5f;     // 4条射线围成的方形范围
 
         // 内部状态
         private float yaw;
@@ -40,6 +39,8 @@ namespace TDTTetris.Player
         private float yawVelocity;
         private System.Collections.Generic.Dictionary<Renderer, Material> fadedRenderers
             = new System.Collections.Generic.Dictionary<Renderer, Material>();
+        private System.Collections.Generic.Dictionary<Renderer, float> fadeTargets
+            = new System.Collections.Generic.Dictionary<Renderer, float>(); // 1=opaque, fadeAlpha=transparent
 
         public bool CloseMode { get; set; }
 
@@ -67,6 +68,7 @@ namespace TDTTetris.Player
 
             HandleRotation();
             HandleFollow();
+            if (fadeObstructions) UpdateFade();
         }
 
         private void HandleRotation()
@@ -115,48 +117,86 @@ namespace TDTTetris.Player
 
         private void HandleObstructionFade()
         {
-            var toRestore = new System.Collections.Generic.List<Renderer>(fadedRenderers.Keys);
-            var toFade = new System.Collections.Generic.List<Renderer>();
-
             Vector3 dir = (transform.position - followTarget.position).normalized;
             float dist = Vector3.Distance(transform.position, followTarget.position);
             Vector3 right = Vector3.Cross(dir, Vector3.up).normalized;
             Vector3 up = Vector3.Cross(right, dir).normalized;
+            float s = fadeCheckSize * 0.5f;
 
-            // 多条射线覆盖视锥
+            // 4条射线 — 角色四角
+            Vector3[] origins = {
+                followTarget.position + right * s + up * s,
+                followTarget.position - right * s - up * s,
+                followTarget.position + right * s - up * s,
+                followTarget.position - right * s + up * s,
+            };
+
             var seen = new System.Collections.Generic.HashSet<Renderer>();
-            for (int ix = 0; ix < fadeRayCount; ix++)
+            foreach (var origin in origins)
             {
-                for (int iy = 0; iy < fadeRayCount; iy++)
+                foreach (var hit in Physics.RaycastAll(origin, dir, dist, obstructionMask))
                 {
-                    float ox = (ix - (fadeRayCount - 1) * 0.5f) * (fadeCheckSize / (fadeRayCount - 1));
-                    float oy = (iy - (fadeRayCount - 1) * 0.5f) * (fadeCheckSize / (fadeRayCount - 1));
-                    Vector3 origin = followTarget.position + right * ox + up * oy;
-
-                    var hits = Physics.RaycastAll(origin, dir, dist, obstructionMask);
-                    foreach (var hit in hits)
-                    {
-                        var r = hit.collider.GetComponent<Renderer>();
-                        if (r == null || r.transform.IsChildOf(followTarget)) continue;
-                        seen.Add(r);
-                    }
+                    var r = hit.collider.GetComponent<Renderer>();
+                    if (r == null || r.transform.IsChildOf(followTarget)) continue;
+                    seen.Add(r);
                 }
             }
 
+            // 设置目标透明度
             foreach (var r in seen)
             {
-                if (!fadedRenderers.ContainsKey(r))
-                    toFade.Add(r);
-                else
-                    toRestore.Remove(r);
+                fadeTargets[r] = fadeAlpha;
+                PrepareFadeMaterial(r);
             }
 
-            foreach (var r in toRestore) RestoreRenderer(r);
-            foreach (var r in toFade) FadeRenderer(r);
+            // 不再遮挡的恢复为不透明
+            var toRemove = new System.Collections.Generic.List<Renderer>();
+            foreach (var kv in fadeTargets)
+            {
+                if (!seen.Contains(kv.Key))
+                    fadeTargets[kv.Key] = 1f;
+            }
         }
 
-        private void FadeRenderer(Renderer r)
+        // 每帧在 LateUpdate 中调用，平滑过渡
+        private void UpdateFade()
         {
+            float dt = Time.deltaTime * 5f; // 渐变速度
+            var done = new System.Collections.Generic.List<Renderer>();
+
+            foreach (var kv in fadeTargets)
+            {
+                var r = kv.Key;
+                if (r == null || r.material == null) { done.Add(r); continue; }
+
+                float current = r.material.color.a;
+                float target = kv.Value;
+                float next = Mathf.Lerp(current, target, dt);
+
+                Color c = r.material.color;
+                c.a = next;
+                r.material.color = c;
+
+                // 到达目标 → 如果是恢复为不透明就清理
+                if (Mathf.Abs(next - 1f) < 0.02f && Mathf.Abs(target - 1f) < 0.01f)
+                {
+                    if (fadedRenderers.TryGetValue(r, out var orig))
+                    {
+                        r.material = orig;
+                        fadedRenderers.Remove(r);
+                    }
+                    done.Add(r);
+                }
+            }
+
+            foreach (var r in done)
+                fadeTargets.Remove(r);
+        }
+
+        private void PrepareFadeMaterial(Renderer r)
+        {
+            if (fadedRenderers.ContainsKey(r)) return;
+
             var orig = r.material;
             var faded = new Material(orig);
             faded.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
@@ -164,22 +204,10 @@ namespace TDTTetris.Player
             faded.SetInt("_ZWrite", 1);
             faded.EnableKeyword("_ALPHABLEND_ON");
             faded.renderQueue = 3000;
+            faded.color = orig.color; // 保持原色，只透明
 
-            Color c = faded.color;
-            c.a = fadeAlpha;
-            faded.color = c;
-
-            r.material = faded;
             fadedRenderers[r] = orig;
-        }
-
-        private void RestoreRenderer(Renderer r)
-        {
-            if (fadedRenderers.TryGetValue(r, out var orig))
-            {
-                r.material = orig;
-                fadedRenderers.Remove(r);
-            }
+            r.material = faded;
         }
     }
 }
