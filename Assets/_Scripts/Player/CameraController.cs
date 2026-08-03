@@ -3,48 +3,54 @@ using UnityEngine;
 namespace TDTTetris.Player
 {
     /// <summary>
-    /// 第三人称相机控制器 — 独立于角色移动
-    /// 平滑跟随 + 碰撞检测防止穿墙
+    /// 第三人称相机 — 独立于角色层级
+    /// 通过引用获取输入和跟随目标，不依赖父子关系
     /// </summary>
     public class CameraController : MonoBehaviour
     {
-        [Header("目标")]
-        [SerializeField] private Transform followTarget;  // 跟随的Player Transform
+        [Header("引用")]
+        [SerializeField] private Transform followTarget;
+        [SerializeField] private InputHandler inputHandler;
+
+        [Header("偏移")]
         [SerializeField] private Vector3 followOffset = new Vector3(0, 1.8f, -5f);
 
         [Header("旋转")]
-        [SerializeField] private float sensitivity = 2f;
-        [SerializeField] private float smoothing = 10f;
+        [SerializeField] private float sensitivityX = 2f;
+        [SerializeField] private float sensitivityY = 2f;
+        [SerializeField] private float smoothing = 12f;
         [SerializeField] private float minPitch = -30f;
         [SerializeField] private float maxPitch = 60f;
+        [SerializeField] private float rotationSmoothTime = 0.1f;
 
         [Header("碰撞")]
         [SerializeField] private LayerMask obstructionMask = ~0;
         [SerializeField] private float collisionRadius = 0.3f;
         [SerializeField] private float minDistance = 1f;
 
-        [Header("臂长切换（进入棋盘内部时拉近）")]
-        [SerializeField] private float closeDistance = 2.5f;
-        [SerializeField] private float farDistance = 5f;
-        private float targetDistance;
-
+        // 内部状态
         private float yaw;
         private float pitch;
-        private Vector3 smoothPosition;
-        private Vector3 smoothForward;
+        private Vector3 currentVelocity = Vector3.zero;
+        private float pitchVelocity;
+        private float yawVelocity;
 
         public bool CloseMode { get; set; }
+        private float targetDistance => CloseMode ? 2.5f : 5f;
 
         private void Awake()
         {
+            // 回退：没设引用时尝试查找
             if (followTarget == null)
-                followTarget = transform.parent;
+            {
+                var pc = FindObjectOfType<PlayerController>();
+                if (pc != null) followTarget = pc.transform;
+            }
+            if (inputHandler == null)
+            {
+                inputHandler = FindObjectOfType<InputHandler>();
+            }
 
-            targetDistance = farDistance;
-            smoothPosition = transform.position;
-            smoothForward = transform.forward;
-
-            // 初始角度
             var euler = transform.eulerAngles;
             yaw = euler.y;
             pitch = euler.x > 180 ? euler.x - 360 : euler.x;
@@ -60,39 +66,50 @@ namespace TDTTetris.Player
 
         private void HandleRotation()
         {
-            // 从 InputHandler 读取（如果存在）或直接读鼠标
-            Vector2 lookDelta = Vector2.zero;
-            var input = GetComponentInParent<InputHandler>();
-            if (input != null)
-                lookDelta = input.LookInput;
+            // 优先从 InputHandler 读取，否则直接读鼠标
+            float mx, my;
+            if (inputHandler != null && inputHandler.CursorLocked)
+            {
+                var look = inputHandler.LookInput;
+                mx = look.x;
+                my = look.y;
+            }
+            else
+            {
+                mx = Input.GetAxis("Mouse X");
+                my = Input.GetAxis("Mouse Y");
+            }
 
-            yaw += lookDelta.x * sensitivity;
-            pitch -= lookDelta.y * sensitivity;
+            yaw += mx * sensitivityX;
+            pitch -= my * sensitivityY;
             pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
 
-            var targetRotation = Quaternion.Euler(pitch, yaw, 0);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, smoothing * Time.deltaTime);
+            // 平滑旋转
+            float smoothPitch = Mathf.SmoothDampAngle(
+                transform.eulerAngles.x > 180 ? transform.eulerAngles.x - 360 : transform.eulerAngles.x,
+                pitch, ref pitchVelocity, rotationSmoothTime);
+            float smoothYaw = Mathf.SmoothDampAngle(transform.eulerAngles.y, yaw, ref yawVelocity, rotationSmoothTime);
+
+            transform.rotation = Quaternion.Euler(smoothPitch, smoothYaw, 0);
         }
 
         private void HandleFollow()
         {
-            targetDistance = CloseMode ? closeDistance : farDistance;
+            float dist = targetDistance;
 
-            // 计算理想位置（根据当前旋转 + 偏移）
-            Vector3 idealOffset = followTarget.rotation * new Vector3(0, followOffset.y, -targetDistance);
-            Vector3 targetPosition = followTarget.position + idealOffset;
+            // 理想相机位置
+            Vector3 desiredOffset = transform.rotation * new Vector3(0, followOffset.y, -dist);
+            Vector3 targetPos = followTarget.position + desiredOffset;
 
-            // 碰撞检测：从目标发射射线，确保相机不会被墙挡住
-            Vector3 dirToCamera = (targetPosition - followTarget.position).normalized;
-            float checkDistance = Vector3.Distance(targetPosition, followTarget.position);
-
-            if (Physics.SphereCast(followTarget.position, collisionRadius, dirToCamera, out var hit, checkDistance, obstructionMask))
+            // 碰撞避让
+            Vector3 dir = (targetPos - followTarget.position).normalized;
+            float checkDist = Vector3.Distance(targetPos, followTarget.position);
+            if (Physics.SphereCast(followTarget.position, collisionRadius, dir, out var hit, checkDist, obstructionMask))
             {
-                targetPosition = followTarget.position + dirToCamera * Mathf.Max(hit.distance - collisionRadius, minDistance);
+                targetPos = followTarget.position + dir * Mathf.Max(hit.distance - collisionRadius, minDistance);
             }
 
-            smoothPosition = Vector3.Lerp(smoothPosition, targetPosition, smoothing * Time.deltaTime);
-            transform.position = smoothPosition;
+            transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref currentVelocity, 0.08f);
         }
     }
 }

@@ -302,12 +302,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.1305262, y: 0, z: 0, w: 0.9914449}
-  m_LocalPosition: {x: 0, y: 1.8, z: -5}
+  m_LocalRotation: {x: 0.1305262, y: -0, z: -0, w: 0.9914449}
+  m_LocalPosition: {x: 4, y: 2.8, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1398561558}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &963194229
 MonoBehaviour:
@@ -322,18 +322,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   followTarget: {fileID: 1398561558}
+  inputHandler: {fileID: 1398561559}
   followOffset: {x: 0, y: 1.8, z: -5}
-  sensitivity: 2
+  sensitivityX: 2
+  sensitivityY: 2
   smoothing: 10
   minPitch: -30
   maxPitch: 60
+  rotationSmoothTime: 0.1
   obstructionMask:
     serializedVersion: 2
     m_Bits: 4294967295
   collisionRadius: 0.3
   minDistance: 1
-  closeDistance: 2.5
-  farDistance: 5
 --- !u!1 &1163150520
 GameObject:
   m_ObjectHideFlags: 0
@@ -474,7 +475,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 963194228}
   - {fileID: 1923393177}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -518,11 +518,6 @@ MonoBehaviour:
   gravity: 20
   maxFallSpeed: 30
   groundStickForce: 5
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  groundCheckOffset: 0.1
-  slopeLimit: 45
 --- !u!1 &1801729518
 GameObject:
   m_ObjectHideFlags: 0
@@ -757,7 +752,7 @@ Transform:
   m_GameObject: {fileID: 1923393176}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.3, y: 2.69, z: -2.01}
+  m_LocalPosition: {x: -0.3, y: 2.03, z: -2.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -916,3 +911,4 @@ SceneRoots:
   - {fileID: 1835432574}
   - {fileID: 1398561558}
   - {fileID: 1876877217}
+  - {fileID: 963194228}
