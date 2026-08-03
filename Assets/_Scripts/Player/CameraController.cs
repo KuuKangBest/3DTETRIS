@@ -13,7 +13,9 @@ namespace TDTTetris.Player
         [SerializeField] private InputHandler inputHandler;
 
         [Header("偏移")]
-        [SerializeField] private Vector3 followOffset = new Vector3(0, 0.8f, -3f);
+        [SerializeField] private float baseYOffset = 0.5f;     // 平视时的高度偏移
+        [SerializeField] private float yOffsetPitchFactor = 0.025f; // 每度俯角增加的高度
+        [SerializeField] private float zDistance = 3f;         // 后方距离
 
         [Header("旋转")]
         [SerializeField] private float sensitivityX = 3f;
@@ -95,10 +97,14 @@ namespace TDTTetris.Player
 
         private void HandleFollow()
         {
+            // 动态 Y 偏移：俯角越大，相机越高（能看到脚和地面）
+            float pitchBelowHorizon = Mathf.Max(0, -pitch);
+            float dynamicY = baseYOffset + pitchBelowHorizon * yOffsetPitchFactor;
+
             float dist = targetDistance;
 
-            // 理想相机位置
-            Vector3 desiredOffset = transform.rotation * new Vector3(0, followOffset.y, -dist);
+            // 根据当前旋转计算偏移
+            Vector3 desiredOffset = transform.rotation * new Vector3(0, dynamicY, -dist);
             Vector3 targetPos = followTarget.position + desiredOffset;
 
             // 碰撞避让
