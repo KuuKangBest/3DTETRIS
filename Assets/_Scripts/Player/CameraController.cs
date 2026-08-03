@@ -13,16 +13,16 @@ namespace TDTTetris.Player
         [SerializeField] private InputHandler inputHandler;
 
         [Header("偏移")]
-        [SerializeField] private float baseYOffset = 0.2f;     // 平视时的高度偏移
-        [SerializeField] private float yOffsetPitchFactor = 0.03f; // 每度俯角增加的高度
-        [SerializeField] private float zDistance = 8f;         // 后方距离
+        [SerializeField] private float baseYOffset = 0.5f;
+        [SerializeField] private float yOffsetPitchFactor = 0.025f;
+        [SerializeField] private float zDistance = 3f;
 
         [Header("旋转")]
-        [SerializeField] private float sensitivityX = 3f;
-        [SerializeField] private float sensitivityY = 3f;
+        [SerializeField] private float sensitivityX = 2f;
+        [SerializeField] private float sensitivityY = 2f;
         [SerializeField] private float smoothing = 12f;
-        [SerializeField] private float minPitch = -35f;
-        [SerializeField] private float maxPitch = 50f;
+        [SerializeField] private float minPitch = -30f;
+        [SerializeField] private float maxPitch = 60f;
         [SerializeField] private float rotationSmoothTime = 0.1f;
 
         [Header("遮挡处理")]

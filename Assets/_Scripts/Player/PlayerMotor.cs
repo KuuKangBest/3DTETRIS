@@ -10,10 +10,10 @@ namespace TDTTetris.Player
     public class PlayerMotor : MonoBehaviour
     {
         [Header("移动 (格/秒)")]
-        [SerializeField] private float walkSpeed = 3f;         // 每秒走3格
+        [SerializeField] private float walkSpeed = 4f;
         [SerializeField] private float sprintMultiplier = 1.6f;
-        [SerializeField] private float acceleration = 15f;     // 地面加速度
-        [SerializeField] private float airAcceleration = 5f;   // 空中加速度
+        [SerializeField] private float acceleration = 15f;
+        [SerializeField] private float airAcceleration = 5f;
 
         [Header("跳跃")]
         [SerializeField] private float jumpHeight = 1.5f;

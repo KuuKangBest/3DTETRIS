@@ -1212,12 +1212,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   followTarget: {fileID: 1398561558}
   inputHandler: {fileID: 1398561559}
-  baseYOffset: 0.2
-  yOffsetPitchFactor: 0.03
-  zDistance: 8
+  baseYOffset: 0.5
+  yOffsetPitchFactor: 0.025
+  zDistance: 3
   sensitivityX: 2
   sensitivityY: 2
-  smoothing: 10
+  smoothing: 12
   minPitch: -30
   maxPitch: 60
   rotationSmoothTime: 0.1
@@ -1616,9 +1616,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1398561558}
   - component: {fileID: 1398561557}
-  - component: {fileID: 1398561556}
-  - component: {fileID: 1398561560}
   - component: {fileID: 1398561559}
+  - component: {fileID: 1398561561}
+  - component: {fileID: 1398561560}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1626,23 +1626,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1398561556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1398561555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9eb4e9e67cb7cec4a9df2634f686b929, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  input: {fileID: 1398561559}
-  motor: {fileID: 1398561560}
-  cameraController: {fileID: 963194229}
-  rotationSpeed: 720
-  skillSystem: {fileID: 0}
 --- !u!143 &1398561557
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1712,19 +1695,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 1398561555}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9eb4e9e67cb7cec4a9df2634f686b929, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  input: {fileID: 1398561559}
+  motor: {fileID: 1398561561}
+  cameraController: {fileID: 963194229}
+  rotationSpeed: 720
+  skillSystem: {fileID: 0}
+--- !u!114 &1398561561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1398561555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ab6665104d7b2641a4e97c680a10958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 3
+  walkSpeed: 4
   sprintMultiplier: 1.6
-  acceleration: 20
-  airAcceleration: 8
+  acceleration: 15
+  airAcceleration: 5
   jumpHeight: 1.5
-  coyoteTime: 0.15
+  coyoteTime: 0.12
   jumpBufferTime: 0.1
-  gravity: 20
-  maxFallSpeed: 30
-  groundStickForce: 5
+  gravity: 25
+  maxFallSpeed: 40
+  groundStickForce: 8
 --- !u!1 &1665512790
 GameObject:
   m_ObjectHideFlags: 0
