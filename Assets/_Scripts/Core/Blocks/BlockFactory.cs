@@ -13,6 +13,11 @@ namespace TDTTetris.Core
         [SerializeField] private GameConfig config;
         [SerializeField] private GameObject blockPrefab;
 
+        private void Awake()
+        {
+            if (config == null) config = Resources.Load<GameConfig>("GameConfig");
+        }
+
         [Header("方块颜色")]
         [SerializeField] private Color[] blockColors = new Color[]
         {

@@ -208,7 +208,9 @@ namespace TDTTetris.Core
         {
             if (config == null)
             {
-                Debug.LogError("GameManager: GameConfig 未设置！请在Inspector中配置。");
+                config = Resources.Load<GameConfig>("GameConfig");
+                if (config != null) Debug.Log("GameManager: 从 Resources 自动加载 GameConfig");
+                else Debug.LogError("GameManager: GameConfig 未找到！");
             }
             if (board == null)
                 board = FindObjectOfType<Board>();

@@ -31,7 +31,13 @@ namespace TDTTetris.Core
         {
             if (config == null)
             {
-                Debug.LogWarning("Board: GameConfig 未设置，使用默认值。请在Inspector中拖入配置。");
+                config = Resources.Load<GameConfig>("GameConfig");
+                if (config != null) Debug.Log("Board: 从 Resources 自动加载 GameConfig");
+            }
+
+            if (config == null)
+            {
+                Debug.LogWarning("Board: GameConfig 未找到，使用默认值。");
                 Width  = 8;
                 Height = 15;
                 Depth  = 8;

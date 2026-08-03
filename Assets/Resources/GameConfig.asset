@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cdbc3a52e40f1e4391959f82a39639b, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  BoardWidth: 8
+  BoardHeight: 15
+  BoardDepth: 8
+  CellSize: 1.6
+  BaseFallInterval: 2
+  SpawnHeight: 14
+  SpawnXMin: 0
+  SpawnXMax: 7
+  SpawnZMin: 0
+  SpawnZMax: 7
+  FullRowChance: 0.05
+  FailHeight: 14
+  PlayerMoveSpeed: 2
+  PlayerJumpForce: 8
+  PlayerGravity: 15
