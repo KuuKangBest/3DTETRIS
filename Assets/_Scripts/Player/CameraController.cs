@@ -55,6 +55,9 @@ namespace TDTTetris.Player
             var euler = transform.eulerAngles;
             yaw = euler.y;
             pitch = euler.x > 180 ? euler.x - 360 : euler.x;
+
+            // 强制排除 IgnoreRaycast 层（暗墙），相机可自由穿出
+            obstructionMask &= ~(1 << LayerMask.NameToLayer("Ignore Raycast"));
         }
 
         private void LateUpdate()

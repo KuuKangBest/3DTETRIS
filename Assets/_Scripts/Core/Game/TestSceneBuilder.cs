@@ -12,7 +12,7 @@ namespace TDTTetris.Core
 
         [Header("随机堆叠")]
         [SerializeField] private int minStackY = 1;
-        [SerializeField] private int maxStackY = 4;
+        [SerializeField] private int maxStackY = 2;
 
         [Header("引用")]
         [SerializeField] private Board board;
