@@ -57,18 +57,17 @@ namespace TDTTetris.Core
             float cs = board.CellSize * 0.95f;
             foreach (var off in shapeOffsets)
             {
+                Vector3 worldPos = board.GridToWorld(gridPosition + off);
+
                 var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cube.name = $"Cell_{off.x}_{off.y}_{off.z}";
                 cube.transform.SetParent(transform, false);
+                cube.transform.position = worldPos;
                 cube.transform.localScale = Vector3.one * cs;
-                cube.transform.localPosition = (Vector3)off * board.CellSize;
 
                 var mat = new Material(Shader.Find("Standard"));
                 mat.color = blockColor;
                 cube.GetComponent<Renderer>().material = mat;
-
-                // 添加碰撞用于玩家站立
-                cube.GetComponent<BoxCollider>().isTrigger = false;
             }
         }
 
@@ -175,11 +174,12 @@ namespace TDTTetris.Core
         /// </summary>
         private void UpdateVisualPosition()
         {
-            var center = Vector3.zero;
-            foreach (var offset in shapeOffsets)
-                center += (Vector3)offset;
-            center /= shapeOffsets.Length;
-            transform.position = board.GridToWorld(gridPosition) + center;
+            // 更新所有子立方体到新格点位置
+            for (int i = 0; i < shapeOffsets.Length && i < transform.childCount; i++)
+            {
+                var child = transform.GetChild(i);
+                child.position = board.GridToWorld(gridPosition + shapeOffsets[i]);
+            }
         }
 
         private void RefreshVisuals()
