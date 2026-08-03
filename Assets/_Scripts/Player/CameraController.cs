@@ -13,9 +13,9 @@ namespace TDTTetris.Player
         [SerializeField] private InputHandler inputHandler;
 
         [Header("偏移")]
-        [SerializeField] private float baseYOffset = 0.5f;     // 平视时的高度偏移
-        [SerializeField] private float yOffsetPitchFactor = 0.025f; // 每度俯角增加的高度
-        [SerializeField] private float zDistance = 4.5f;       // 后方距离
+        [SerializeField] private float baseYOffset = 0.2f;     // 平视时的高度偏移
+        [SerializeField] private float yOffsetPitchFactor = 0.03f; // 每度俯角增加的高度
+        [SerializeField] private float zDistance = 8f;         // 后方距离
 
         [Header("旋转")]
         [SerializeField] private float sensitivityX = 3f;
