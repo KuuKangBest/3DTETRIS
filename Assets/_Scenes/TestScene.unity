@@ -1037,11 +1037,12 @@ MonoBehaviour:
   minPitch: -30
   maxPitch: 60
   rotationSmoothTime: 0.1
+  fadeObstructions: 1
   obstructionMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  collisionRadius: 0.3
-  minDistance: 1
+  fadeAlpha: 0.3
+  fadeCheckSize: 1.5
 --- !u!1 &652888491
 GameObject:
   m_ObjectHideFlags: 0
