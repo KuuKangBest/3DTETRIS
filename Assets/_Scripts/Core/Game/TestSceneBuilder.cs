@@ -74,7 +74,7 @@ namespace TDTTetris.Core
 
         private void BuildFloor()
         {
-            System.Random rng = new System.Random(42 + (int)Time.time);
+            System.Random rng = new System.Random(Random.Range(1, 99999));
             int placed = 0;
 
             for (int x = 0; x < board.Width; x++)
@@ -96,7 +96,7 @@ namespace TDTTetris.Core
 
         private void BuildRandomStacks()
         {
-            System.Random rng = new System.Random(137 + (int)Time.time);
+            System.Random rng = new System.Random(Random.Range(1, 99999));
             int placed = 0;
 
             for (int x = 0; x < board.Width; x++)
