@@ -15,7 +15,7 @@ MonoBehaviour:
   BoardWidth: 8
   BoardHeight: 15
   BoardDepth: 8
-  CellSize: 2
+  CellSize: 4
   BaseFallInterval: 2
   SpawnHeight: 14
   SpawnXMin: 0
