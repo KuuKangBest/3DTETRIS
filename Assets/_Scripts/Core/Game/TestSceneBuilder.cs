@@ -44,7 +44,9 @@ namespace TDTTetris.Core
 
         private void Start()
         {
-            // Play时全新生成
+            // Play时全新生成 — 先清除棋盘数据
+            if (board == null) board = FindObjectOfType<Board>();
+            board?.ClearAll();
             ClearChildren();
             GenerateMap();
             PlacePlayer();

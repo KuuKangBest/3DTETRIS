@@ -122,6 +122,17 @@ namespace TDTTetris.Core
         public void ClearCell(Vector3Int pos) => ClearCell(pos.x, pos.y, pos.z);
 
         /// <summary>
+        /// 清空整个棋盘 — 用于场景重建
+        /// </summary>
+        public void ClearAll()
+        {
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
+                    for (int z = 0; z < Depth; z++)
+                        grid[x, y, z] = Cell.Empty;
+        }
+
+        /// <summary>
         /// 获取格子数据（只读）
         /// </summary>
         public Cell GetCell(int x, int y, int z)

@@ -21,8 +21,8 @@ namespace TDTTetris.Player
         [SerializeField] private float sensitivityX = 3f;
         [SerializeField] private float sensitivityY = 3f;
         [SerializeField] private float smoothing = 12f;
-        [SerializeField] private float minPitch = -50f;
-        [SerializeField] private float maxPitch = 70f;
+        [SerializeField] private float minPitch = -35f;
+        [SerializeField] private float maxPitch = 50f;
         [SerializeField] private float rotationSmoothTime = 0.1f;
 
         [Header("碰撞")]
