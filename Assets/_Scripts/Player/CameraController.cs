@@ -13,14 +13,14 @@ namespace TDTTetris.Player
         [SerializeField] private InputHandler inputHandler;
 
         [Header("偏移")]
-        [SerializeField] private Vector3 followOffset = new Vector3(0, 1.5f, -3f);
+        [SerializeField] private Vector3 followOffset = new Vector3(0, 0.8f, -3f);
 
         [Header("旋转")]
         [SerializeField] private float sensitivityX = 3f;
         [SerializeField] private float sensitivityY = 3f;
         [SerializeField] private float smoothing = 12f;
-        [SerializeField] private float minPitch = -30f;
-        [SerializeField] private float maxPitch = 60f;
+        [SerializeField] private float minPitch = -50f;
+        [SerializeField] private float maxPitch = 70f;
         [SerializeField] private float rotationSmoothTime = 0.1f;
 
         [Header("碰撞")]
