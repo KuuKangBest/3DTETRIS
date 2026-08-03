@@ -3,10 +3,8 @@ using UnityEngine;
 namespace TDTTetris.Core
 {
     /// <summary>
-    /// 测试场景构建器 — 模拟真实游戏流程
-    /// Play时自动生成，编辑器中右键 Blocks 组件 → Generate / Clear
+    /// 测试场景构建器 — Play时自动随机生成，编辑器中右键 Generate/Clear
     /// </summary>
-    [ExecuteAlways]
     public class TestSceneBuilder : MonoBehaviour
     {
         [Header("方块外观")]
@@ -33,22 +31,18 @@ namespace TDTTetris.Core
         };
 
         private float blockSize;
-        private bool generated;
-
-        private void OnEnable()
-        {
-            // 编辑模式下打开场景时自动生成预览
-            if (!Application.isPlaying && !generated)
-                EditorGenerate();
-        }
 
         private void Start()
         {
-            // Play时全新生成 — 先清除棋盘数据
             if (board == null) board = FindObjectOfType<Board>();
+
+            // 完全重置
             board?.ClearAll();
             ClearChildren();
-            GenerateMap();
+
+            blockSize = board.CellSize * blockSizeRatio;
+            BuildFloor();
+            BuildRandomStacks();
             PlacePlayer();
         }
 
@@ -57,33 +51,30 @@ namespace TDTTetris.Core
         [ContextMenu("Generate")]
         private void EditorGenerate()
         {
-            ClearChildren();
-            GenerateMap();
-            generated = true;
-        }
-
-        [ContextMenu("Clear")]
-        private void EditorClear()
-        {
-            ClearChildren();
-            generated = false;
-        }
-
-        #endregion
-
-        private void GenerateMap()
-        {
+            if (Application.isPlaying) return;
             if (board == null) board = FindObjectOfType<Board>();
-            if (board == null) return;
+
+            board?.ClearAll();
+            ClearChildren();
 
             blockSize = board.CellSize * blockSizeRatio;
             BuildFloor();
             BuildRandomStacks();
         }
 
+        [ContextMenu("Clear")]
+        private void EditorClear()
+        {
+            if (Application.isPlaying) return;
+            board?.ClearAll();
+            ClearChildren();
+        }
+
+        #endregion
+
         private void BuildFloor()
         {
-            System.Random rng = new System.Random(42);
+            System.Random rng = new System.Random(42 + (int)Time.time);
             int placed = 0;
 
             for (int x = 0; x < board.Width; x++)
@@ -105,7 +96,7 @@ namespace TDTTetris.Core
 
         private void BuildRandomStacks()
         {
-            System.Random rng = new System.Random(137);
+            System.Random rng = new System.Random(137 + (int)Time.time);
             int placed = 0;
 
             for (int x = 0; x < board.Width; x++)
@@ -166,7 +157,6 @@ namespace TDTTetris.Core
 
         private void ClearChildren()
         {
-            // 清除上次生成的所有子物体
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
                 var child = transform.GetChild(i);
