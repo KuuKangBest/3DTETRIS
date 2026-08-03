@@ -2048,9 +2048,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711327964933af443b6e3e8913540cb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blockSize: 1.9
-  minStackHeight: 0
-  maxStackHeight: 4
+  blockSizeRatio: 0.95
+  minStackY: 1
+  maxStackY: 4
   board: {fileID: 1941598661}
   playerTransform: {fileID: 0}
 --- !u!4 &1414078951
@@ -2585,6 +2585,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1941598662}
   - component: {fileID: 1941598661}
+  - component: {fileID: 1941598663}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -2626,6 +2627,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1941598663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1941598660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f30a6347b5be44d46a32f1a6633cf751, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  board: {fileID: 1941598661}
+  wallThickness: 0.5
 --- !u!1 &2046761356
 GameObject:
   m_ObjectHideFlags: 0

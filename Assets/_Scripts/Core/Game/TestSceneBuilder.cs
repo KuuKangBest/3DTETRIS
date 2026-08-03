@@ -1,38 +1,42 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace TDTTetris.Core
 {
     /// <summary>
-    /// 测试场景构建器 — 底层铺满 8×8，上方随机堆叠
+    /// 测试场景构建器 — 模拟真实游戏流程
+    /// 每个方块必须通过 Board 注册，绝不重叠
     /// </summary>
     public class TestSceneBuilder : MonoBehaviour
     {
-        [Header("配置")]
-        [SerializeField] private float blockSize = 0.95f;
-        [SerializeField] private int minStackHeight = 0;   // 每个格点最低堆叠高度
-        [SerializeField] private int maxStackHeight = 4;   // 每个格点最高堆叠高度
+        [Header("方块外观")]
+        [SerializeField] private float blockSizeRatio = 0.95f; // 方块相对格子的缩放比例
+
+        [Header("随机堆叠")]
+        [SerializeField] private int minStackY = 1;   // 堆叠起始高度
+        [SerializeField] private int maxStackY = 4;   // 堆叠最高高度
 
         [Header("引用")]
         [SerializeField] private Board board;
         [SerializeField] private Transform playerTransform;
 
-        private static readonly Color[] BlockColors =
+        private static readonly Color[] Colors =
         {
-            new Color(1.00f, 0.42f, 0.42f), // 红
-            new Color(1.00f, 0.75f, 0.35f), // 橙
-            new Color(1.00f, 0.92f, 0.42f), // 黄
-            new Color(0.42f, 0.85f, 0.55f), // 绿
-            new Color(0.42f, 0.65f, 1.00f), // 蓝
-            new Color(0.65f, 0.45f, 1.00f), // 紫
-            new Color(1.00f, 0.55f, 0.75f), // 粉
-            new Color(0.45f, 0.85f, 0.85f), // 青
+            new Color(1.00f, 0.42f, 0.42f),
+            new Color(1.00f, 0.75f, 0.35f),
+            new Color(1.00f, 0.92f, 0.42f),
+            new Color(0.42f, 0.85f, 0.55f),
+            new Color(0.42f, 0.65f, 1.00f),
+            new Color(0.65f, 0.45f, 1.00f),
+            new Color(1.00f, 0.55f, 0.75f),
+            new Color(0.45f, 0.85f, 0.85f),
         };
+
+        private float blockSize;
 
         private void Start()
         {
-            if (board == null)
-                board = FindObjectOfType<Board>();
+            if (board == null) board = FindObjectOfType<Board>();
+            blockSize = board.CellSize * blockSizeRatio;
 
             BuildFloor();
             BuildRandomStacks();
@@ -40,96 +44,101 @@ namespace TDTTetris.Core
         }
 
         /// <summary>
-        /// 底层铺满 8×8（y=0）
+        /// 底层铺满 8×8 — 模拟游戏中掉落方块形成的平面
         /// </summary>
         private void BuildFloor()
         {
-            var mat = CreateMaterial(BlockColors[4]); // 蓝色地板
+            System.Random rng = new System.Random(42);
+            int placed = 0;
 
             for (int x = 0; x < board.Width; x++)
             {
                 for (int z = 0; z < board.Depth; z++)
                 {
-                    PlaceBlockAtGrid(x, 0, z, mat, "Floor");
+                    // 用 Board.PlaceBlock 注册 — 不会重叠
+                    var pos = new Vector3Int(x, 0, z);
+                    if (board.IsOccupied(pos)) continue;
+
+                    var color = Colors[rng.Next(Colors.Length)];
+                    board.PlaceBlock(pos, new[] { Vector3Int.zero }, EliminationFlags.All, color);
+                    SpawnVisual(pos, color, "Floor");
+                    placed++;
                 }
             }
 
-            Debug.Log("[TestScene] 底层 8×8 铺满完成");
+            Debug.Log($"[TestScene] 底层铺满 {placed} 个方块 (y=0)");
         }
 
         /// <summary>
-        /// 每个 (x,z) 格点随机叠加方块
+        /// 随机堆叠 — 每个 (x,z) 随机叠 0~maxStackY 层
         /// </summary>
         private void BuildRandomStacks()
         {
-            // 确保同一列的方块颜色一致（看起来像整块叠上去的）
-            // 但为了更像散落，每层随机
-            int blockCount = 0;
+            System.Random rng = new System.Random(137);
+            int placed = 0;
 
             for (int x = 0; x < board.Width; x++)
             {
                 for (int z = 0; z < board.Depth; z++)
                 {
-                    int height = Random.Range(minStackHeight, maxStackHeight + 1);
+                    int stackHeight = rng.Next(minStackY, maxStackY + 1);
+                    if (stackHeight == 0) continue;
 
-                    // 留一些空洞 — 约30%的格点不叠
-                    if (Random.value < 0.3f && height == maxStackHeight)
-                        height = 0;
+                    // 约 30% 概率留空，制造散落感
+                    if (rng.NextDouble() < 0.3f) continue;
 
-                    for (int y = 1; y <= height; y++)
+                    var color = Colors[rng.Next(Colors.Length)];
+                    for (int y = minStackY; y <= stackHeight; y++)
                     {
-                        var mat = CreateMaterial(BlockColors[Random.Range(0, BlockColors.Length)]);
-                        PlaceBlockAtGrid(x, y, z, mat, "Block");
-                        blockCount++;
+                        var pos = new Vector3Int(x, y, z);
+                        if (board.IsOccupied(pos)) break; // 上方已被占，停止这列
+
+                        board.PlaceBlock(pos, new[] { Vector3Int.zero }, EliminationFlags.All, color);
+                        SpawnVisual(pos, color, "Block");
+                        placed++;
                     }
                 }
             }
 
-            Debug.Log($"[TestScene] 随机堆叠 {blockCount} 个方块");
+            Debug.Log($"[TestScene] 随机堆叠 {placed} 个方块");
         }
 
         /// <summary>
-        /// 玩家放在棋盘正中央
+        /// 创建方块的视觉实体（带碰撞）
+        /// </summary>
+        private void SpawnVisual(Vector3Int gridPos, Color color, string tag)
+        {
+            Vector3 worldPos = board.GridToWorld(gridPos);
+
+            var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.name = $"{tag}_{gridPos.x}_{gridPos.y}_{gridPos.z}";
+            cube.transform.SetParent(transform, false);
+            cube.transform.position = worldPos;
+            cube.transform.localScale = Vector3.one * blockSize;
+
+            var mat = new Material(Shader.Find("Standard"));
+            mat.color = color;
+            cube.GetComponent<Renderer>().material = mat;
+        }
+
+        /// <summary>
+        /// 玩家放到棋盘正中央
         /// </summary>
         private void PlacePlayer()
         {
             if (playerTransform == null)
             {
-                var player = FindObjectOfType<Player.PlayerController>();
-                if (player != null)
-                    playerTransform = player.transform;
+                var pc = FindObjectOfType<Player.PlayerController>();
+                if (pc != null) playerTransform = pc.transform;
             }
 
             if (playerTransform != null)
             {
                 float cx = board.Width * board.CellSize * 0.5f;
                 float cz = board.Depth * board.CellSize * 0.5f;
-                playerTransform.position = new Vector3(cx, 2f, cz);
+                float py = board.CellSize * 2f; // 站在方块上方
+                playerTransform.position = new Vector3(cx, py, cz);
             }
-        }
-
-        private void PlaceBlockAtGrid(int gx, int gy, int gz, Material mat, string tag)
-        {
-            var worldPos = board.GridToWorld(gx, gy, gz);
-            var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.name = $"{tag}_{gx}_{gy}_{gz}";
-            cube.transform.SetParent(transform, false);
-            cube.transform.position = worldPos;
-            cube.transform.localScale = Vector3.one * blockSize;
-
-            var renderer = cube.GetComponent<Renderer>();
-            renderer.material = mat;
-
-            // BoxCollider 已经由 CreatePrimitive 自带
-
-            return cube;
-        }
-
-        private Material CreateMaterial(Color color)
-        {
-            var mat = new Material(Shader.Find("Standard"));
-            mat.color = color;
-            return mat;
         }
     }
 }
