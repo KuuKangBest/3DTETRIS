@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "com.gladekit.mcp-bridge": "file:../mcp/glade-mcp/unity-bridge",
-    "com.uac.editor-api": "https://github.com/SamDreamsMaker/unity-api-communicator-package.git",
+    "com.unity.inputsystem": "1.0.0",
+    "com.unity.ai.navigation": "1.0.0",
     "com.unity.collab-proxy": "2.6.0",
     "com.unity.feature.development": "1.0.1",
     "com.unity.textmeshpro": "3.0.7",
