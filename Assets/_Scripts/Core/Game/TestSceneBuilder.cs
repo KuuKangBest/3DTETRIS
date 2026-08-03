@@ -4,16 +4,17 @@ namespace TDTTetris.Core
 {
     /// <summary>
     /// 测试场景构建器 — 模拟真实游戏流程
-    /// 每个方块必须通过 Board 注册，绝不重叠
+    /// Play时自动生成，编辑器中右键 Blocks 组件 → Generate / Clear
     /// </summary>
+    [ExecuteAlways]
     public class TestSceneBuilder : MonoBehaviour
     {
         [Header("方块外观")]
-        [SerializeField] private float blockSizeRatio = 0.95f; // 方块相对格子的缩放比例
+        [SerializeField] private float blockSizeRatio = 0.95f;
 
         [Header("随机堆叠")]
-        [SerializeField] private int minStackY = 1;   // 堆叠起始高度
-        [SerializeField] private int maxStackY = 4;   // 堆叠最高高度
+        [SerializeField] private int minStackY = 1;
+        [SerializeField] private int maxStackY = 4;
 
         [Header("引用")]
         [SerializeField] private Board board;
@@ -32,20 +33,52 @@ namespace TDTTetris.Core
         };
 
         private float blockSize;
+        private bool generated;
+
+        private void OnEnable()
+        {
+            // 编辑模式下打开场景时自动生成预览
+            if (!Application.isPlaying && !generated)
+                EditorGenerate();
+        }
 
         private void Start()
         {
-            if (board == null) board = FindObjectOfType<Board>();
-            blockSize = board.CellSize * blockSizeRatio;
-
-            BuildFloor();
-            BuildRandomStacks();
+            // Play时全新生成
+            ClearChildren();
+            GenerateMap();
             PlacePlayer();
         }
 
-        /// <summary>
-        /// 底层铺满 8×8 — 模拟游戏中掉落方块形成的平面
-        /// </summary>
+        #region 编辑模式右键菜单
+
+        [ContextMenu("Generate")]
+        private void EditorGenerate()
+        {
+            ClearChildren();
+            GenerateMap();
+            generated = true;
+        }
+
+        [ContextMenu("Clear")]
+        private void EditorClear()
+        {
+            ClearChildren();
+            generated = false;
+        }
+
+        #endregion
+
+        private void GenerateMap()
+        {
+            if (board == null) board = FindObjectOfType<Board>();
+            if (board == null) return;
+
+            blockSize = board.CellSize * blockSizeRatio;
+            BuildFloor();
+            BuildRandomStacks();
+        }
+
         private void BuildFloor()
         {
             System.Random rng = new System.Random(42);
@@ -55,7 +88,6 @@ namespace TDTTetris.Core
             {
                 for (int z = 0; z < board.Depth; z++)
                 {
-                    // 用 Board.PlaceBlock 注册 — 不会重叠
                     var pos = new Vector3Int(x, 0, z);
                     if (board.IsOccupied(pos)) continue;
 
@@ -66,12 +98,9 @@ namespace TDTTetris.Core
                 }
             }
 
-            Debug.Log($"[TestScene] 底层铺满 {placed} 个方块 (y=0)");
+            Debug.Log($"[TestScene] 底层 {placed} 块");
         }
 
-        /// <summary>
-        /// 随机堆叠 — 每个 (x,z) 随机叠 0~maxStackY 层
-        /// </summary>
         private void BuildRandomStacks()
         {
             System.Random rng = new System.Random(137);
@@ -83,15 +112,13 @@ namespace TDTTetris.Core
                 {
                     int stackHeight = rng.Next(minStackY, maxStackY + 1);
                     if (stackHeight == 0) continue;
-
-                    // 约 30% 概率留空，制造散落感
                     if (rng.NextDouble() < 0.3f) continue;
 
                     var color = Colors[rng.Next(Colors.Length)];
                     for (int y = minStackY; y <= stackHeight; y++)
                     {
                         var pos = new Vector3Int(x, y, z);
-                        if (board.IsOccupied(pos)) break; // 上方已被占，停止这列
+                        if (board.IsOccupied(pos)) break;
 
                         board.PlaceBlock(pos, new[] { Vector3Int.zero }, EliminationFlags.All, color);
                         SpawnVisual(pos, color, "Block");
@@ -100,12 +127,9 @@ namespace TDTTetris.Core
                 }
             }
 
-            Debug.Log($"[TestScene] 随机堆叠 {placed} 个方块");
+            Debug.Log($"[TestScene] 堆叠 {placed} 块");
         }
 
-        /// <summary>
-        /// 创建方块的视觉实体（带碰撞）
-        /// </summary>
         private void SpawnVisual(Vector3Int gridPos, Color color, string tag)
         {
             Vector3 worldPos = board.GridToWorld(gridPos);
@@ -121,9 +145,6 @@ namespace TDTTetris.Core
             cube.GetComponent<Renderer>().material = mat;
         }
 
-        /// <summary>
-        /// 玩家放到棋盘正中央
-        /// </summary>
         private void PlacePlayer()
         {
             if (playerTransform == null)
@@ -136,8 +157,21 @@ namespace TDTTetris.Core
             {
                 float cx = board.Width * board.CellSize * 0.5f;
                 float cz = board.Depth * board.CellSize * 0.5f;
-                float py = board.CellSize * 2f; // 站在方块上方
+                float py = board.CellSize * 2f;
                 playerTransform.position = new Vector3(cx, py, cz);
+            }
+        }
+
+        private void ClearChildren()
+        {
+            // 清除上次生成的所有子物体
+            for (int i = transform.childCount - 1; i >= 0; i--)
+            {
+                var child = transform.GetChild(i);
+                if (Application.isPlaying)
+                    Destroy(child.gameObject);
+                else
+                    DestroyImmediate(child.gameObject);
             }
         }
     }
