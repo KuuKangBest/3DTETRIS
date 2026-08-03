@@ -1757,7 +1757,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ab6665104d7b2641a4e97c680a10958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 20
+  walkSpeed: 4
   sprintMultiplier: 1.6
   acceleration: 15
   airAcceleration: 5
@@ -2501,7 +2501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b4e617d9615db94c9b789be322e7223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  config: {fileID: 0}
+  config: {fileID: 11400000, guid: 11a7f27c37b3c704d91fc9f841a71fba, type: 2}
   OnCellFilled:
     m_PersistentCalls:
       m_Calls: []
