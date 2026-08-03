@@ -150,12 +150,14 @@ namespace TDTTetris.Player
             }
 
             // 不再遮挡的恢复为不透明
-            var toRemove = new System.Collections.Generic.List<Renderer>();
+            var toRestore = new System.Collections.Generic.List<Renderer>();
             foreach (var kv in fadeTargets)
             {
                 if (!seen.Contains(kv.Key))
-                    fadeTargets[kv.Key] = 1f;
+                    toRestore.Add(kv.Key);
             }
+            foreach (var r in toRestore)
+                fadeTargets[r] = 1f;
         }
 
         // 每帧在 LateUpdate 中调用，平滑过渡
