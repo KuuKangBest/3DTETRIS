@@ -1212,18 +1212,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   followTarget: {fileID: 1398561558}
   inputHandler: {fileID: 1398561559}
-  followOffset: {x: 0, y: 1.8, z: -5}
+  baseYOffset: 0.2
+  yOffsetPitchFactor: 0.03
+  zDistance: 8
   sensitivityX: 2
   sensitivityY: 2
   smoothing: 10
   minPitch: -30
   maxPitch: 60
   rotationSmoothTime: 0.1
+  fadeObstructions: 1
   obstructionMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  collisionRadius: 0.3
-  minDistance: 1
+  fadeAlpha: 0.3
+  fadeCheckSize: 1.5
 --- !u!1 &968622675
 GameObject:
   m_ObjectHideFlags: 0
@@ -1675,7 +1678,7 @@ Transform:
   m_GameObject: {fileID: 1398561555}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 2, z: 1}
+  m_LocalPosition: {x: 6.4, y: 4, z: 6.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2467,6 +2470,8 @@ GameObject:
   - component: {fileID: 1952517605}
   - component: {fileID: 1952517606}
   - component: {fileID: 1952517608}
+  - component: {fileID: 1952517610}
+  - component: {fileID: 1952517609}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -2541,6 +2546,34 @@ MonoBehaviour:
   lineMaterial: {fileID: 0}
   gridColor: {r: 0.3, g: 0.6, b: 0.9, a: 0.4}
   lineWidth: 0.04
+--- !u!114 &1952517609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952517604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72149c638967467438f9391173c5e045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  board: {fileID: 1952517605}
+  floorColor: {r: 0.25, g: 0.35, b: 0.45, a: 0.6}
+--- !u!114 &1952517610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952517604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f30a6347b5be44d46a32f1a6633cf751, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  board: {fileID: 1952517605}
+  wallThickness: 0.5
 --- !u!1 &1978516810
 GameObject:
   m_ObjectHideFlags: 0

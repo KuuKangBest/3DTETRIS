@@ -48,7 +48,28 @@ namespace TDTTetris.Core
             fallTimer = 0f;
             IsActive = true;
 
+            CreateVisualCubes();
             UpdateVisualPosition();
+        }
+
+        private void CreateVisualCubes()
+        {
+            float cs = board.CellSize * 0.95f;
+            foreach (var off in shapeOffsets)
+            {
+                var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.name = $"Cell_{off.x}_{off.y}_{off.z}";
+                cube.transform.SetParent(transform, false);
+                cube.transform.localScale = Vector3.one * cs;
+                cube.transform.localPosition = (Vector3)off * board.CellSize;
+
+                var mat = new Material(Shader.Find("Standard"));
+                mat.color = blockColor;
+                cube.GetComponent<Renderer>().material = mat;
+
+                // 添加碰撞用于玩家站立
+                cube.GetComponent<BoxCollider>().isTrigger = false;
+            }
         }
 
         private void Update()
@@ -116,7 +137,7 @@ namespace TDTTetris.Core
                 rotationY = newRotY;
                 rotationZ = newRotZ;
                 shapeOffsets = rotated;
-                UpdateVisualPosition();
+                RefreshVisuals();
                 return true;
             }
             return false;
@@ -154,13 +175,21 @@ namespace TDTTetris.Core
         /// </summary>
         private void UpdateVisualPosition()
         {
-            // 方块的位置是basePos的平均中心
             var center = Vector3.zero;
             foreach (var offset in shapeOffsets)
                 center += (Vector3)offset;
             center /= shapeOffsets.Length;
-
             transform.position = board.GridToWorld(gridPosition) + center;
+        }
+
+        private void RefreshVisuals()
+        {
+            // 销毁旧视觉
+            for (int i = transform.childCount - 1; i >= 0; i--)
+                Destroy(transform.GetChild(i).gameObject);
+            // 重新创建
+            CreateVisualCubes();
+            UpdateVisualPosition();
         }
 
         private void OnDrawGizmos()

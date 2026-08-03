@@ -53,6 +53,7 @@ namespace TDTTetris.Core
         private void Start()
         {
             ValidateReferences();
+            StartGame();
         }
 
         private void Update()
