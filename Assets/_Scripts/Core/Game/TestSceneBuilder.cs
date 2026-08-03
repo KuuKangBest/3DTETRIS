@@ -50,7 +50,7 @@ namespace TDTTetris.Core
             {
                 for (int z = 0; z < board.Depth; z++)
                 {
-                    CreateBlock(x, 0, z, mat, "Floor");
+                    PlaceBlockAtGrid(x, 0, z, mat, "Floor");
                 }
             }
 
@@ -79,7 +79,7 @@ namespace TDTTetris.Core
                     for (int y = 1; y <= height; y++)
                     {
                         var mat = CreateMaterial(BlockColors[Random.Range(0, BlockColors.Length)]);
-                        CreateBlock(x, y, z, mat, "Block");
+                        PlaceBlockAtGrid(x, y, z, mat, "Block");
                         blockCount++;
                     }
                 }
@@ -102,19 +102,19 @@ namespace TDTTetris.Core
 
             if (playerTransform != null)
             {
-                float cx = board.Width * 0.5f;
-                float cz = board.Depth * 0.5f;
+                float cx = board.Width * board.CellSize * 0.5f;
+                float cz = board.Depth * board.CellSize * 0.5f;
                 playerTransform.position = new Vector3(cx, 2f, cz);
             }
         }
 
-        private GameObject CreateBlock(int x, int y, int z, Material mat, string tag)
+        private void PlaceBlockAtGrid(int gx, int gy, int gz, Material mat, string tag)
         {
+            var worldPos = board.GridToWorld(gx, gy, gz);
             var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.name = $"{tag}_{x}_{y}_{z}";
+            cube.name = $"{tag}_{gx}_{gy}_{gz}";
             cube.transform.SetParent(transform, false);
-            // 直接放整数坐标 — 和网格线对齐
-            cube.transform.position = new Vector3(x, y, z);
+            cube.transform.position = worldPos;
             cube.transform.localScale = Vector3.one * blockSize;
 
             var renderer = cube.GetComponent<Renderer>();
