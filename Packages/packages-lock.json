@@ -1,5 +1,30 @@
 {
   "dependencies": {
+    "com.gladekit.mcp-bridge": {
+      "version": "file:../mcp/glade-mcp/unity-bridge",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.unity.inputsystem": "1.0.0",
+        "com.unity.ai.navigation": "1.0.0"
+      }
+    },
+    "com.uac.editor-api": {
+      "version": "https://github.com/SamDreamsMaker/unity-api-communicator-package.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "12a74df35e898e69c86cfa33b95af4215bc0f1fc"
+    },
+    "com.unity.ai.navigation": {
+      "version": "1.1.5",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.ai": "1.0.0"
+      },
+      "url": "https://packages.unity.cn"
+    },
     "com.unity.collab-proxy": {
       "version": "2.6.0",
       "depth": 0,
@@ -58,6 +83,15 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {},
+      "url": "https://packages.unity.cn"
+    },
+    "com.unity.inputsystem": {
+      "version": "1.11.2",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.uielements": "1.0.0"
+      },
       "url": "https://packages.unity.cn"
     },
     "com.unity.performance.profile-analyzer": {

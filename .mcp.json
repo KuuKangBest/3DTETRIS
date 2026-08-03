@@ -1,12 +1,8 @@
 {
   "mcpServers": {
-    "unity-uac": {
-      "command": "npx",
-      "args": ["-y", "uac-mcp-server"],
-      "env": {
-        "UAC_HOST": "localhost",
-        "UAC_PORT": "7777"
-      }
+    "gladekit-unity": {
+      "command": "C:/Users/ASUS/.local/bin/uv.exe",
+      "args": ["run", "--directory", "e:/Unity/3DTETRIS/mcp/glade-mcp/mcp-server", "gladekit-mcp"]
     }
   }
 }
