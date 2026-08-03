@@ -1755,7 +1755,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   input: {fileID: 1078546657}
   motor: {fileID: 1078546658}
-  cameraController: {fileID: 0}
+  cameraController: {fileID: 649089240}
   rotationSpeed: 720
   skillSystem: {fileID: 0}
 --- !u!114 &1078546657
@@ -2079,10 +2079,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711327964933af443b6e3e8913540cb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blockCount: 30
   blockSize: 0.95
-  materials: []
+  minStackHeight: 0
+  maxStackHeight: 4
   board: {fileID: 1941598661}
+  playerTransform: {fileID: 0}
 --- !u!4 &1414078951
 Transform:
   m_ObjectHideFlags: 0
