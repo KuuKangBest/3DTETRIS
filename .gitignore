@@ -73,3 +73,4 @@ ConsoleLog/
 .env
 .env.local
 .env.*.local
+.claude/

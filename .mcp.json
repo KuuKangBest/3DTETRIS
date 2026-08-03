@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "unity-uac": {
+      "command": "npx",
+      "args": ["-y", "uac-mcp-server"],
+      "env": {
+        "UAC_HOST": "localhost",
+        "UAC_PORT": "7777"
+      }
+    }
+  }
+}
