@@ -33,6 +33,7 @@ namespace TDTTetris.Player
         private float lastGroundedTime;
         private float lastJumpPressedTime;
         private bool jumpConsumed;
+        private Core.GameConfig config;
 
         public bool IsGrounded => isGrounded;
         public Vector3 Velocity => velocity + Vector3.up * verticalVelocity;
@@ -41,6 +42,12 @@ namespace TDTTetris.Player
         {
             controller = GetComponent<CharacterController>();
             cachedTransform = transform;
+            config = Resources.Load<Core.GameConfig>("GameConfig");
+            if (config != null)
+            {
+                walkSpeed = config.PlayerMoveSpeed;
+                gravity = config.PlayerGravity;
+            }
         }
 
         public void Move(Vector3 inputDir, bool sprint, bool jumpPressed)
