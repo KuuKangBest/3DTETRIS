@@ -13,7 +13,7 @@ namespace TDTTetris.Player
         [SerializeField] private InputHandler inputHandler;
 
         [Header("偏移")]
-        [SerializeField] private Vector3 followOffset = new Vector3(0, 3f, -4f);
+        [SerializeField] private Vector3 followOffset = new Vector3(0, 1.5f, -3f);
 
         [Header("旋转")]
         [SerializeField] private float sensitivityX = 3f;
