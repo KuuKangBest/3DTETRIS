@@ -26,9 +26,10 @@ namespace TDTTetris.Player
         [SerializeField] private float rotationSmoothTime = 0.1f;
 
         [Header("遮挡处理")]
-        [SerializeField] private bool fadeObstructions = true;   // 挡镜头的方块变半透明
+        [SerializeField] private bool fadeObstructions = true;
         [SerializeField] private LayerMask obstructionMask = ~0;
-        [SerializeField] private float fadeAlpha = 0.3f;         // 遮挡时透明度
+        [SerializeField] private float fadeAlpha = 0.3f;
+        [SerializeField] private float fadeCheckRadius = 2f;     // 视锥检测半径
 
         // 内部状态
         private float yaw;
@@ -118,12 +119,20 @@ namespace TDTTetris.Player
 
             Vector3 dir = (transform.position - followTarget.position).normalized;
             float dist = Vector3.Distance(transform.position, followTarget.position);
-            var hits = Physics.RaycastAll(followTarget.position, dir, dist, obstructionMask);
+
+            // 用球形检测覆盖视锥范围
+            var hits = Physics.SphereCastAll(
+                followTarget.position + dir * 0.5f,   // 从人物前方一点开始
+                fadeCheckRadius,
+                dir,
+                dist - 0.5f,
+                obstructionMask);
 
             foreach (var hit in hits)
             {
                 var r = hit.collider.GetComponent<Renderer>();
-                if (r == null || r == followTarget.GetComponentInChildren<Renderer>()) continue;
+                if (r == null) continue;
+                if (r.transform.IsChildOf(followTarget)) continue; // 忽略角色自身
 
                 if (!fadedRenderers.ContainsKey(r))
                     toFade.Add(r);
@@ -131,13 +140,8 @@ namespace TDTTetris.Player
                     toRestore.Remove(r);
             }
 
-            // 恢复不再遮挡的
-            foreach (var r in toRestore)
-                RestoreRenderer(r);
-
-            // 新遮挡物变半透明
-            foreach (var r in toFade)
-                FadeRenderer(r);
+            foreach (var r in toRestore) RestoreRenderer(r);
+            foreach (var r in toFade) FadeRenderer(r);
         }
 
         private void FadeRenderer(Renderer r)
