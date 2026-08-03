@@ -29,7 +29,8 @@ namespace TDTTetris.Player
         [SerializeField] private bool fadeObstructions = true;
         [SerializeField] private LayerMask obstructionMask = ~0;
         [SerializeField] private float fadeAlpha = 0.3f;
-        [SerializeField] private float fadeCheckSize = 1.5f;     // 4条射线围成的方形范围
+        [SerializeField] private float fadeCheckSize = 1.5f;
+        [SerializeField] private float fadeForwardOffset = 0.6f; // 射线从人物前方出发
 
         // 内部状态
         private float yaw;
@@ -123,12 +124,13 @@ namespace TDTTetris.Player
             Vector3 up = Vector3.Cross(right, dir).normalized;
             float s = fadeCheckSize * 0.5f;
 
-            // 4条射线 — 角色四角
+            // 4条射线 — 从角色前方出发
+            Vector3 fwd = dir * fadeForwardOffset;
             Vector3[] origins = {
-                followTarget.position + right * s + up * s,
-                followTarget.position - right * s - up * s,
-                followTarget.position + right * s - up * s,
-                followTarget.position - right * s + up * s,
+                followTarget.position + right * s + up * s + fwd,
+                followTarget.position - right * s - up * s + fwd,
+                followTarget.position + right * s - up * s + fwd,
+                followTarget.position - right * s + up * s + fwd,
             };
 
             var seen = new System.Collections.Generic.HashSet<Renderer>();
