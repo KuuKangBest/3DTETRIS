@@ -29,7 +29,8 @@ namespace TDTTetris.Player
         [SerializeField] private bool fadeObstructions = true;
         [SerializeField] private LayerMask obstructionMask = ~0;
         [SerializeField] private float fadeAlpha = 0.3f;
-        [SerializeField] private float fadeCheckRadius = 2f;     // 视锥检测半径
+        [SerializeField] private float fadeCheckSize = 1.5f;     // 多射线覆盖范围
+        [SerializeField] private int fadeRayCount = 3;           // 每维射线数 (3×3=9条)
 
         // 内部状态
         private float yaw;
@@ -119,21 +120,31 @@ namespace TDTTetris.Player
 
             Vector3 dir = (transform.position - followTarget.position).normalized;
             float dist = Vector3.Distance(transform.position, followTarget.position);
+            Vector3 right = Vector3.Cross(dir, Vector3.up).normalized;
+            Vector3 up = Vector3.Cross(right, dir).normalized;
 
-            // 用球形检测覆盖视锥范围
-            var hits = Physics.SphereCastAll(
-                followTarget.position + dir * 0.5f,   // 从人物前方一点开始
-                fadeCheckRadius,
-                dir,
-                dist - 0.5f,
-                obstructionMask);
-
-            foreach (var hit in hits)
+            // 多条射线覆盖视锥
+            var seen = new System.Collections.Generic.HashSet<Renderer>();
+            for (int ix = 0; ix < fadeRayCount; ix++)
             {
-                var r = hit.collider.GetComponent<Renderer>();
-                if (r == null) continue;
-                if (r.transform.IsChildOf(followTarget)) continue; // 忽略角色自身
+                for (int iy = 0; iy < fadeRayCount; iy++)
+                {
+                    float ox = (ix - (fadeRayCount - 1) * 0.5f) * (fadeCheckSize / (fadeRayCount - 1));
+                    float oy = (iy - (fadeRayCount - 1) * 0.5f) * (fadeCheckSize / (fadeRayCount - 1));
+                    Vector3 origin = followTarget.position + right * ox + up * oy;
 
+                    var hits = Physics.RaycastAll(origin, dir, dist, obstructionMask);
+                    foreach (var hit in hits)
+                    {
+                        var r = hit.collider.GetComponent<Renderer>();
+                        if (r == null || r.transform.IsChildOf(followTarget)) continue;
+                        seen.Add(r);
+                    }
+                }
+            }
+
+            foreach (var r in seen)
+            {
                 if (!fadedRenderers.ContainsKey(r))
                     toFade.Add(r);
                 else
