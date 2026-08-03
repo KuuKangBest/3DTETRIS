@@ -25,11 +25,10 @@ namespace TDTTetris.Player
         [SerializeField] private float maxPitch = 50f;
         [SerializeField] private float rotationSmoothTime = 0.1f;
 
-        [Header("碰撞")]
-        [SerializeField] private bool checkObstruction = false; // 关闭后相机不做碰撞检测
+        [Header("遮挡处理")]
+        [SerializeField] private bool fadeObstructions = true;   // 挡镜头的方块变半透明
         [SerializeField] private LayerMask obstructionMask = ~0;
-        [SerializeField] private float collisionRadius = 0.3f;
-        [SerializeField] private float minDistance = 1.5f;
+        [SerializeField] private float fadeAlpha = 0.3f;         // 遮挡时透明度
 
         // 内部状态
         private float yaw;
@@ -37,6 +36,8 @@ namespace TDTTetris.Player
         private Vector3 currentVelocity = Vector3.zero;
         private float pitchVelocity;
         private float yawVelocity;
+        private System.Collections.Generic.Dictionary<Renderer, Material> fadedRenderers
+            = new System.Collections.Generic.Dictionary<Renderer, Material>();
 
         public bool CloseMode { get; set; }
 
@@ -97,28 +98,73 @@ namespace TDTTetris.Player
 
         private void HandleFollow()
         {
-            // 动态 Y 偏移：俯角越大，相机越高（能看到脚和地面）
             float pitchBelowHorizon = Mathf.Max(0, -pitch);
             float dynamicY = baseYOffset + pitchBelowHorizon * yOffsetPitchFactor;
-
             float dist = CloseMode ? 2.5f : zDistance;
 
-            // 根据当前旋转计算偏移
             Vector3 desiredOffset = transform.rotation * new Vector3(0, dynamicY, -dist);
             Vector3 targetPos = followTarget.position + desiredOffset;
+            transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref currentVelocity, 0.08f);
 
-            // 碰撞避让（可关闭）
-            if (checkObstruction)
+            // 遮挡物半透明
+            if (fadeObstructions)
+                HandleObstructionFade();
+        }
+
+        private void HandleObstructionFade()
+        {
+            var toRestore = new System.Collections.Generic.List<Renderer>(fadedRenderers.Keys);
+            var toFade = new System.Collections.Generic.List<Renderer>();
+
+            Vector3 dir = (transform.position - followTarget.position).normalized;
+            float dist = Vector3.Distance(transform.position, followTarget.position);
+            var hits = Physics.RaycastAll(followTarget.position, dir, dist, obstructionMask);
+
+            foreach (var hit in hits)
             {
-                Vector3 dir = (targetPos - followTarget.position).normalized;
-                float checkDist = Vector3.Distance(targetPos, followTarget.position);
-                if (Physics.SphereCast(followTarget.position, collisionRadius, dir, out var hit, checkDist, obstructionMask))
-                {
-                    targetPos = followTarget.position + dir * Mathf.Max(hit.distance - collisionRadius, minDistance);
-                }
+                var r = hit.collider.GetComponent<Renderer>();
+                if (r == null || r == followTarget.GetComponentInChildren<Renderer>()) continue;
+
+                if (!fadedRenderers.ContainsKey(r))
+                    toFade.Add(r);
+                else
+                    toRestore.Remove(r);
             }
 
-            transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref currentVelocity, 0.08f);
+            // 恢复不再遮挡的
+            foreach (var r in toRestore)
+                RestoreRenderer(r);
+
+            // 新遮挡物变半透明
+            foreach (var r in toFade)
+                FadeRenderer(r);
+        }
+
+        private void FadeRenderer(Renderer r)
+        {
+            var orig = r.material;
+            var faded = new Material(orig);
+            faded.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            faded.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            faded.SetInt("_ZWrite", 1);
+            faded.EnableKeyword("_ALPHABLEND_ON");
+            faded.renderQueue = 3000;
+
+            Color c = faded.color;
+            c.a = fadeAlpha;
+            faded.color = c;
+
+            r.material = faded;
+            fadedRenderers[r] = orig;
+        }
+
+        private void RestoreRenderer(Renderer r)
+        {
+            if (fadedRenderers.TryGetValue(r, out var orig))
+            {
+                r.material = orig;
+                fadedRenderers.Remove(r);
+            }
         }
     }
 }
