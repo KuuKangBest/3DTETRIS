@@ -26,9 +26,9 @@ namespace TDTTetris.Player
         [SerializeField] private float rotationSmoothTime = 0.1f;
 
         [Header("碰撞")]
-        [SerializeField] private LayerMask obstructionMask = ~0;
+        [SerializeField] private LayerMask obstructionMask = ~(1 << 2); // 排除 IgnoreRaycast 层
         [SerializeField] private float collisionRadius = 0.3f;
-        [SerializeField] private float minDistance = 1f;
+        [SerializeField] private float minDistance = 1.5f;
 
         // 内部状态
         private float yaw;
@@ -38,7 +38,6 @@ namespace TDTTetris.Player
         private float yawVelocity;
 
         public bool CloseMode { get; set; }
-        private float targetDistance => CloseMode ? 2.5f : 5f;
 
         private void Awake()
         {
@@ -101,7 +100,7 @@ namespace TDTTetris.Player
             float pitchBelowHorizon = Mathf.Max(0, -pitch);
             float dynamicY = baseYOffset + pitchBelowHorizon * yOffsetPitchFactor;
 
-            float dist = targetDistance;
+            float dist = CloseMode ? 2.5f : zDistance;
 
             // 根据当前旋转计算偏移
             Vector3 desiredOffset = transform.rotation * new Vector3(0, dynamicY, -dist);
