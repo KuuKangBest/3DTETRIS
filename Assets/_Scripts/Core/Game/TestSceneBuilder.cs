@@ -5,7 +5,8 @@ namespace TDTTetris.Core
     /// <summary>
     /// 测试场景构建器 — Play时自动随机生成，编辑器中右键 Generate/Clear
     /// </summary>
-    public class TestSceneBuilder : MonoBehaviour
+    [DefaultExecutionOrder(-50)] // 确保在任何游戏逻辑之前运行
+public class TestSceneBuilder : MonoBehaviour
     {
         [Header("方块外观")]
         [SerializeField] private float blockSizeRatio = 0.95f;
