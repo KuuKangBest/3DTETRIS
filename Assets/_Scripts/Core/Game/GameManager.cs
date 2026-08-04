@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -54,6 +55,12 @@ namespace TDTTetris.Core
         private void Start()
         {
             ValidateReferences();
+            StartCoroutine(DelayedStart());
+        }
+
+        private System.Collections.IEnumerator DelayedStart()
+        {
+            yield return null; // 等一帧，确保 TestSceneBuilder 完成
             StartGame();
         }
 
