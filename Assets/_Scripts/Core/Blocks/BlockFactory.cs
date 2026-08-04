@@ -109,10 +109,10 @@ namespace TDTTetris.Core
             int shapeDepth = maxZ - minZ + 1;
 
             // 随机XZ位置
-            int maxX = config.SpawnXMax - shapeWidth + 1;
-            int maxZ = config.SpawnZMax - shapeDepth + 1;
-            int x = Random.Range(config.SpawnXMin, Mathf.Max(config.SpawnXMin + 1, maxX + 1));
-            int z = Random.Range(config.SpawnZMin, Mathf.Max(config.SpawnZMin + 1, maxZ + 1));
+            int spawnMaxX = config.SpawnXMax - shapeWidth + 1;
+            int spawnMaxZ = config.SpawnZMax - shapeDepth + 1;
+            int x = Random.Range(config.SpawnXMin, Mathf.Max(config.SpawnXMin + 1, spawnMaxX + 1));
+            int z = Random.Range(config.SpawnZMin, Mathf.Max(config.SpawnZMin + 1, spawnMaxZ + 1));
 
             return new Vector3Int(x, config.SpawnHeight, z);
         }
