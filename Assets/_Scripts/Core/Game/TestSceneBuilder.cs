@@ -37,7 +37,7 @@ namespace TDTTetris.Core
             if (board == null) board = FindObjectOfType<Board>();
 
             // 完全重置
-            board?.ClearAll();
+            board?.ClearRegion(0, 2);
             ClearChildren();
 
             blockSize = board.CellSize * blockSizeRatio;
@@ -54,7 +54,7 @@ namespace TDTTetris.Core
             if (Application.isPlaying) return;
             if (board == null) board = FindObjectOfType<Board>();
 
-            board?.ClearAll();
+            board?.ClearRegion(0, 2);
             ClearChildren();
 
             blockSize = board.CellSize * blockSizeRatio;
@@ -66,7 +66,7 @@ namespace TDTTetris.Core
         private void EditorClear()
         {
             if (Application.isPlaying) return;
-            board?.ClearAll();
+            board?.ClearRegion(0, 2);
             ClearChildren();
         }
 
