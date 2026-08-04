@@ -1844,7 +1844,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blockSizeRatio: 0.95
   minStackY: 1
-  maxStackY: 4
+  maxStackY: 2
   board: {fileID: 1941598661}
   playerTransform: {fileID: 1078546660}
 --- !u!4 &1255039337

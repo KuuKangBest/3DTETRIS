@@ -53,8 +53,14 @@ namespace TDTTetris.Core
             var landing = gridPosition;
             while (board.CanPlace(landing + Vector3Int.down, shapeOffsets))
                 landing += Vector3Int.down;
-            Debug.Log($"[Block] Ghost landing at grid {landing} from start {gridPosition}, " +
-                      $"below blocked? {!board.CanPlace(landing + Vector3Int.down, shapeOffsets)}");
+
+            // 检查每个cell
+            foreach (var off in shapeOffsets)
+            {
+                var checkPos = landing + off;
+                Debug.Log($"[Block] Ghost cell at {checkPos} — occupied: {board.IsOccupied(checkPos)}");
+            }
+            Debug.Log($"[Block] Ghost land at {landing}, below CanPlace: {!board.CanPlace(landing + Vector3Int.down, shapeOffsets)}");
             return landing;
         }
 
