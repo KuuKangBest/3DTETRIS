@@ -20,6 +20,9 @@
 - 映射：`GridToWorld(gx,gy,gz)` → 世界坐标 `(gx*cs+cs/2, gy*cs+cs/2, gz*cs+cs/2)`
 - 缩放：`CellSize * blockSizeRatio`（默认 ratio=0.95）
 - 碰撞：每个方块自带 BoxCollider
+- 出生位置：随机 XZ，避免重复路径
+- 落定延迟：0.5s（触底后可微调，参考经典俄罗斯方块）
+- 幽灵预览：半透明白色方块标示最终落地位置，无碰撞
 
 ### 标准形状（11种）
 
