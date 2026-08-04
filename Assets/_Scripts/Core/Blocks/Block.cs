@@ -49,7 +49,62 @@ namespace TDTTetris.Core
             IsActive = true;
 
             CreateVisualCubes();
+            CreateGhostPreview();
             UpdateVisualPosition();
+        }
+
+        /// <summary>
+        /// 计算方块将会降落到的最底位置（模拟下落直到不能降为止）
+        /// </summary>
+        public Vector3Int CalculateLandingPosition()
+        {
+            var landing = gridPosition;
+            while (board.CanPlace(landing + Vector3Int.down, shapeOffsets))
+                landing += Vector3Int.down;
+            return landing;
+        }
+
+        /// <summary>
+        /// 在落地位置创建半透明白色预览方块
+        /// </summary>
+        public void CreateGhostPreview()
+        {
+            // 清除旧的ghost
+            for (int i = transform.childCount - 1; i >= 0; i--)
+            {
+                var c = transform.GetChild(i);
+                if (c.name.StartsWith("Ghost"))
+                    Destroy(c.gameObject);
+            }
+
+            if (!IsActive) return;
+
+            var landing = CalculateLandingPosition();
+            float cs = board.CellSize * 0.95f;
+
+            foreach (var off in shapeOffsets)
+            {
+                Vector3 worldPos = board.GridToWorld(landing + off);
+
+                var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.name = $"Ghost_{off.x}_{off.y}_{off.z}";
+                cube.transform.SetParent(transform, false);
+                cube.transform.position = worldPos;
+                cube.transform.localScale = Vector3.one * cs;
+
+                // 移除碰撞
+                Destroy(cube.GetComponent<BoxCollider>());
+
+                // 半透明白色
+                var mat = new Material(Shader.Find("Standard"));
+                mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                mat.SetInt("_ZWrite", 1);
+                mat.EnableKeyword("_ALPHABLEND_ON");
+                mat.renderQueue = 3000;
+                mat.color = new Color(1f, 1f, 1f, 0.5f);
+                cube.GetComponent<Renderer>().material = mat;
+            }
         }
 
         private void CreateVisualCubes()
@@ -94,6 +149,7 @@ namespace TDTTetris.Core
             {
                 gridPosition = newPos;
                 UpdateVisualPosition();
+                CreateGhostPreview();
                 return true;
             }
             else
@@ -114,6 +170,7 @@ namespace TDTTetris.Core
             {
                 gridPosition = newPos;
                 UpdateVisualPosition();
+                CreateGhostPreview();
                 return true;
             }
             return false;
@@ -189,6 +246,7 @@ namespace TDTTetris.Core
                 Destroy(transform.GetChild(i).gameObject);
             // 重新创建
             CreateVisualCubes();
+            CreateGhostPreview();
             UpdateVisualPosition();
         }
 

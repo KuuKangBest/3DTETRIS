@@ -1043,6 +1043,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   fadeAlpha: 0.3
   fadeCheckSize: 1.5
+  fadeForwardOffset: 0.6
 --- !u!1 &652888491
 GameObject:
   m_ObjectHideFlags: 0
