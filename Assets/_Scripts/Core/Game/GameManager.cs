@@ -19,6 +19,7 @@ namespace TDTTetris.Core
     /// 游戏管理器 — 核心游戏循环
     /// 负责协调Board、BlockFactory、EliminationSystem
     /// </summary>
+    [DefaultExecutionOrder(100)] // 确保测试方块先生成
     public class GameManager : MonoBehaviour
     {
         [Header("配置")]
