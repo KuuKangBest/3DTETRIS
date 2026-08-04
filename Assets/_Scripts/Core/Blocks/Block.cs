@@ -214,8 +214,14 @@ namespace TDTTetris.Core
         private void LockInPlace()
         {
             IsActive = false;
+            // 清除落地预览
+            for (int i = transform.childCount - 1; i >= 0; i--)
+            {
+                var c = transform.GetChild(i);
+                if (c.name.StartsWith("Ghost"))
+                    Destroy(c.gameObject);
+            }
             board.PlaceBlock(gridPosition, shapeOffsets, flags, blockColor);
-            // GameManager 会通过事件收到通知并处理消除+生成新方块
         }
 
         /// <summary>
