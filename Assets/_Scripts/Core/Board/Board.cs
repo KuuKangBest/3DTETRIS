@@ -29,6 +29,7 @@ namespace TDTTetris.Core
 
         private void Awake()
         {
+            Debug.Log($"[Board] Awake called, grid={(grid != null ? "exists" : "null")}, CellSize from GameConfig: {(config != null ? config.CellSize : -1f)}");
             if (config == null)
             {
                 config = Resources.Load<GameConfig>("GameConfig");
