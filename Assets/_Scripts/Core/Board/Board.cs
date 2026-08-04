@@ -146,6 +146,7 @@ namespace TDTTetris.Core
         /// </summary>
         public void ClearRegion(int yMin, int yMax)
         {
+            Debug.Log($"[Board] ClearRegion({yMin},{yMax}) frame={Time.frameCount} stack={new System.Diagnostics.StackTrace()}");
             for (int x = 0; x < Width; x++)
                 for (int y = yMin; y <= yMax; y++)
                     for (int z = 0; z < Depth; z++)
