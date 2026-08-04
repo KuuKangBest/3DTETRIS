@@ -60,7 +60,8 @@ namespace TDTTetris.Core
                 var checkPos = landing + off;
                 Debug.Log($"[Block] Ghost cell at {checkPos} — occupied: {board.IsOccupied(checkPos)}");
             }
-            Debug.Log($"[Block] Ghost land at {landing}, below CanPlace: {!board.CanPlace(landing + Vector3Int.down, shapeOffsets)}");
+            Debug.Log($"[Block] Ghost land at {landing}, below CanPlace: {!board.CanPlace(landing + Vector3Int.down, shapeOffsets)}, " +
+                      $"board instance={board.GetHashCode()}");
             return landing;
         }
 

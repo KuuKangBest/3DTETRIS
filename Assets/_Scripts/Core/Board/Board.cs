@@ -102,6 +102,8 @@ namespace TDTTetris.Core
         /// </summary>
         public void PlaceBlock(Vector3Int basePos, Vector3Int[] offsets, EliminationFlags flags, Color color)
         {
+            Debug.Log($"[Board] PlaceBlock base={basePos}, offsets={offsets.Length}, " +
+                      $"grid[base] occupied before={IsOccupied(basePos)}, instance={GetHashCode()}");
             foreach (var offset in offsets)
             {
                 var pos = basePos + offset;
