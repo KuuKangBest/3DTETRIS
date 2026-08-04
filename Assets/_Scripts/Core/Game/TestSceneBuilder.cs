@@ -35,6 +35,7 @@ public class TestSceneBuilder : MonoBehaviour
 
         private void Start()
         {
+            Debug.Log($"[TestScene] Start() called, frame={Time.frameCount}");
             if (board == null) board = FindObjectOfType<Board>();
 
             // 完全重置
@@ -121,7 +122,10 @@ public class TestSceneBuilder : MonoBehaviour
                 }
             }
 
-            Debug.Log($"[TestScene] 堆叠 {placed} 块");
+            // 验证写入
+            Debug.Log($"[TestScene] 堆叠 {placed} 块. Verify: (3,0,3) occupied={board.IsOccupied(new Vector3Int(3,0,3))}, " +
+                      $"(3,0,4) occupied={board.IsOccupied(new Vector3Int(3,0,4))}, " +
+                      $"Board instance={board.GetHashCode()}");
         }
 
         private void SpawnVisual(Vector3Int gridPos, Color color, string tag)
