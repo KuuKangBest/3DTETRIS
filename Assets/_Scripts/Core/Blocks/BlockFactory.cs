@@ -108,13 +108,11 @@ namespace TDTTetris.Core
             int shapeWidth = maxX - minX + 1;
             int shapeDepth = maxZ - minZ + 1;
 
-            // 在XZ面居中
-            int x = (config.BoardWidth - shapeWidth) / 2 - minX;
-            int z = (config.BoardDepth - shapeDepth) / 2 - minZ;
-
-            // 限制在范围内
-            x = Mathf.Clamp(x, config.SpawnXMin, config.SpawnXMax - shapeWidth + 1);
-            z = Mathf.Clamp(z, config.SpawnZMin, config.SpawnZMax - shapeDepth + 1);
+            // 随机XZ位置
+            int maxX = config.SpawnXMax - shapeWidth + 1;
+            int maxZ = config.SpawnZMax - shapeDepth + 1;
+            int x = Random.Range(config.SpawnXMin, Mathf.Max(config.SpawnXMin + 1, maxX + 1));
+            int z = Random.Range(config.SpawnZMin, Mathf.Max(config.SpawnZMin + 1, maxZ + 1));
 
             return new Vector3Int(x, config.SpawnHeight, z);
         }
