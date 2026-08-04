@@ -84,7 +84,7 @@ public class TestSceneBuilder : MonoBehaviour
                     if (board.IsOccupied(pos)) continue;
 
                     var color = Colors[rng.Next(Colors.Length)];
-                    board.PlaceBlock(pos, new[] { Vector3Int.zero }, EliminationFlags.All, color);
+                    board.PlaceBlock(pos, new[] { Vector3Int.zero }, EliminationFlags.None, color);
                     SpawnVisual(pos, color, "Floor");
                     placed++;
                 }
@@ -112,7 +112,7 @@ public class TestSceneBuilder : MonoBehaviour
                         var pos = new Vector3Int(x, y, z);
                         if (board.IsOccupied(pos)) break;
 
-                        board.PlaceBlock(pos, new[] { Vector3Int.zero }, EliminationFlags.All, color);
+                        board.PlaceBlock(pos, new[] { Vector3Int.zero }, EliminationFlags.None, color);
                         SpawnVisual(pos, color, "Block");
                         placed++;
                     }
