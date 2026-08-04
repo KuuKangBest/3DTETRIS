@@ -29,11 +29,9 @@ namespace TDTTetris.Core
 
         private void Awake()
         {
-            Debug.Log($"[Board] Awake called, grid={(grid != null ? "exists" : "null")}, CellSize from GameConfig: {(config != null ? config.CellSize : -1f)}");
             if (config == null)
             {
                 config = Resources.Load<GameConfig>("GameConfig");
-                if (config != null) Debug.Log("Board: 从 Resources 自动加载 GameConfig");
             }
 
             if (config == null)
@@ -113,8 +111,6 @@ namespace TDTTetris.Core
                 }
 
                 grid[pos.x, pos.y, pos.z] = new Cell(flags, color);
-                if (pos == basePos) // 只对第一个cell做验证
-                    Debug.Log($"[Board] PlaceBlock wrote cell at {pos}, immediate read back: IsOccupied={grid[pos.x, pos.y, pos.z].IsOccupied}");
                 OnCellFilled?.Invoke(pos);
             }
         }
@@ -146,7 +142,6 @@ namespace TDTTetris.Core
         /// </summary>
         public void ClearRegion(int yMin, int yMax)
         {
-            Debug.Log($"[Board] ClearRegion({yMin},{yMax}) frame={Time.frameCount} stack={new System.Diagnostics.StackTrace()}");
             for (int x = 0; x < Width; x++)
                 for (int y = yMin; y <= yMax; y++)
                     for (int z = 0; z < Depth; z++)

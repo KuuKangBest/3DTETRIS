@@ -53,15 +53,6 @@ namespace TDTTetris.Core
             var landing = gridPosition;
             while (board.CanPlace(landing + Vector3Int.down, shapeOffsets))
                 landing += Vector3Int.down;
-
-            // 检查每个cell
-            foreach (var off in shapeOffsets)
-            {
-                var checkPos = landing + off;
-                Debug.Log($"[Block] Ghost cell at {checkPos} — occupied: {board.IsOccupied(checkPos)}");
-            }
-            Debug.Log($"[Block] Ghost land at {landing}, below CanPlace: {!board.CanPlace(landing + Vector3Int.down, shapeOffsets)}, " +
-                      $"board instance={board.GetHashCode()}");
             return landing;
         }
 
@@ -178,8 +169,6 @@ namespace TDTTetris.Core
 
             // 注册到棋盘
             board.PlaceBlock(gridPosition, shapeOffsets, flags, blockColor);
-            Debug.Log($"[Block] LockInPlace at grid {gridPosition}, cells count={shapeOffsets.Length}, " +
-                      $"sample IsOccupied={board.IsOccupied(gridPosition + shapeOffsets[0])}");
         }
 
         public void ForceFall()
