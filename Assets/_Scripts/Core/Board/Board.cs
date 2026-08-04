@@ -103,8 +103,6 @@ namespace TDTTetris.Core
         /// </summary>
         public void PlaceBlock(Vector3Int basePos, Vector3Int[] offsets, EliminationFlags flags, Color color)
         {
-            Debug.Log($"[Board] PlaceBlock base={basePos}, offsets={offsets.Length}, " +
-                      $"grid[base] occupied before={IsOccupied(basePos)}, instance={GetHashCode()}");
             foreach (var offset in offsets)
             {
                 var pos = basePos + offset;
@@ -115,6 +113,8 @@ namespace TDTTetris.Core
                 }
 
                 grid[pos.x, pos.y, pos.z] = new Cell(flags, color);
+                if (pos == basePos) // 只对第一个cell做验证
+                    Debug.Log($"[Board] PlaceBlock wrote cell at {pos}, immediate read back: IsOccupied={grid[pos.x, pos.y, pos.z].IsOccupied}");
                 OnCellFilled?.Invoke(pos);
             }
         }
